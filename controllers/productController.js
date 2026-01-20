@@ -1,54 +1,131 @@
 import db from "../config/db.js";
 
+/* =======================
+   GET ALL PRODUCTS
+======================= */
 export const getProducts = async (req, res) => {
   try {
     const [rows] = await db.query(
-      "SELECT * FROM products WHERE category_id = 'AC'"
+      "SELECT * FROM products"
     );
     res.json(rows);
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(500).json(err);
   }
 };
 
 
-export const getProductById = (req, res) => {
-  db.query(
-    "SELECT * FROM products WHERE product_id=?",
-    [req.params.id],
-    (err, result) => res.json(result[0])
-  );
+// get product by category
+export const getProductByCategory = async (req, res) => {
+  try {
+    const { categoryId } = req.params;
+
+    const [rows] = await db.query(
+      "SELECT * FROM products WHERE CATEGORY_ID = ?",
+      [categoryId]
+    );
+
+    res.json(rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 };
 
-export const getProductByCategory = (req, res) => {
-  db.query(
-    "SELECT * FROM products WHERE category_id=?",
-    [req.params.id],
-    (err, result) => res.json(result)
-  );
+
+/* =======================
+   GET PRODUCT BY ID
+======================= */
+export const getProductById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const [rows] = await db.query(
+      "SELECT * FROM products WHERE PRODUCT_ID = ?",
+      [id]
+    );
+    res.json(rows[0]);
+  } catch (err) {
+    res.status(500).json(err);
+  }
 };
 
-export const createProduct = (req, res) => {
-  const { category_id, product_name, price, stock, image, description } = req.body;
-  db.query(
-    "INSERT INTO products VALUES (NULL,?,?,?,?,?,?)",
-    [category_id, product_name, price, stock, image, description],
-    () => res.json({ message: "Produk berhasil ditambahkan" })
-  );
+/* =======================
+   CREATE PRODUCT
+======================= */
+export const createProduct = async (req, res) => {
+  try {
+    const {
+      PRODUCT_NAME,
+      PRICE,
+      CATEGORY_ID,
+      STOCK
+    } = req.body;
+
+    const sql = `
+      INSERT INTO products
+      (PRODUCT_NAME, PRICE, CATEGORY_ID, STOCK,
+       CREATED_AT, CREATED_BY, UPDATED_AT, UPDATED_BY)
+      VALUES (?, ?, ?, ?, CURDATE(), 'ADMIN', CURDATE(), 'ADMIN')
+    `;
+
+    await db.query(sql, [
+      PRODUCT_NAME,
+      PRICE,
+      CATEGORY_ID,
+      STOCK
+    ]);
+
+    res.json({ message: "Product berhasil ditambahkan" });
+  } catch (err) {
+    res.status(500).json(err);
+  }
 };
 
-export const updateProduct = (req, res) => {
-  db.query(
-    "UPDATE products SET product_name=?, price=?, stock=?, image=?, description=? WHERE product_id=?",
-    [req.body.product_name, req.body.price, req.body.stock, req.body.image, req.body.description, req.params.id],
-    () => res.json({ message: "Produk berhasil diupdate" })
-  );
+/* =======================
+   UPDATE PRODUCT
+======================= */
+export const updateProduct = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const {
+      PRODUCT_NAME,
+      PRICE,
+      STOCK
+    } = req.body;
+
+    const sql = `
+      UPDATE products
+      SET PRODUCT_NAME = ?, PRICE = ?, STOCK = ?,
+          UPDATED_AT = CURDATE(), UPDATED_BY = 'ADMIN'
+      WHERE PRODUCT_ID = ?
+    `;
+
+    await db.query(sql, [
+      PRODUCT_NAME,
+      PRICE,
+      STOCK,
+      id
+    ]);
+
+    res.json({ message: "Product berhasil diupdate" });
+  } catch (err) {
+    res.status(500).json(err);
+  }
 };
 
-export const deleteProduct = (req, res) => {
-  db.query(
-    "DELETE FROM products WHERE product_id=?",
-    [req.params.id],
-    () => res.json({ message: "Produk berhasil dihapus" })
-  );
+/* =======================
+   DELETE PRODUCT
+======================= */
+export const deleteProduct = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    await db.query(
+      "DELETE FROM products WHERE PRODUCT_ID = ?",
+      [id]
+    );
+
+    res.json({ message: "Product berhasil dihapus" });
+  } catch (err) {
+    res.status(500).json(err);
+  }
 };

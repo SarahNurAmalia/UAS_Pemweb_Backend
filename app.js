@@ -5,7 +5,11 @@ import dotenv from "dotenv";
 import categoryRoutes from "./routes/categoryRoutes.js";
 import productRoutes from "./routes/productRoutes.js";
 import customerRoutes from "./routes/customerRoutes.js";
-import transaksiRoutes from "./routes/transaksiRoutes.js";
+import ordersRoutes from "./routes/orderRoutes.js";
+import orderDetailRoutes from "./routes/orderDetailRoutes.js";
+import databaseRoutes from "./routes/databaseRoutes.js";
+
+
 
 dotenv.config();
 const app = express();
@@ -16,7 +20,9 @@ app.use(express.json());
 app.use("/categories", categoryRoutes);
 app.use("/products", productRoutes);
 app.use("/customers", customerRoutes);
-app.use("/penjualan", transaksiRoutes);
+app.use("/orders", ordersRoutes);
+app.use("/order-details", orderDetailRoutes);
+app.use("/database", databaseRoutes);
 
 app.get("/profile", (req, res) => {
   res.json({
