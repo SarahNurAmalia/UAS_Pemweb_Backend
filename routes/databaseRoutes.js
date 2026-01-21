@@ -8,7 +8,8 @@ import {
   monthlyProfitProduct,
   monthlySalesProduct,
   monthlyOrderCustomer,
-  monthlyNominalCustomer
+  monthlyNominalCustomer,
+  layananBulananKasir
 } from "../controllers/databaseController.js";
 
 const router = express.Router();
@@ -22,5 +23,6 @@ router.get("/profit-bulanan-produk", monthlyProfitProduct);
 router.get("/penjualan-bulanan-produk", monthlySalesProduct);
 router.get("/order-bulanan-customer", monthlyOrderCustomer);
 router.get("/nominal-bulanan-customer", monthlyNominalCustomer);
+router.get("/layanan-bulanan-kasir", layananBulananKasir);
 
 export default router;

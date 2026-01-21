@@ -138,3 +138,33 @@ export const monthlyNominalCustomer = async (req, res) => {
   res.json(rows);
 };
 
+
+/* ============================
+   10. Jumlah layanan bulanan tahun sebelumnya per kasir
+============================ */
+export const layananBulananKasir = async (req, res) => {
+  try {
+    const [rows] = await db.query(`
+      SELECT 
+        kasir,
+        bulan,
+        jumlah_layanan
+      FROM (
+        SELECT
+          o.USER_ID AS kasir,
+          MONTH(o.ORDER_DATE) AS bulan,
+          COUNT(o.ORDER_ID) AS jumlah_layanan
+        FROM orders o
+        WHERE YEAR(o.ORDER_DATE) = YEAR(CURDATE()) - 1
+        GROUP BY o.USER_ID, MONTH(o.ORDER_DATE)
+      ) AS sub
+      ORDER BY kasir, bulan
+    `);
+
+    res.json(rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+
